@@ -84,7 +84,7 @@ export default function RAGChatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>("midnight");
+  const [currentTheme, setCurrentTheme] = useState<ThemeName>("forest");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const theme = themes[currentTheme];
 

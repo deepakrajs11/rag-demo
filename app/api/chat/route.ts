@@ -41,7 +41,7 @@ export async function POST(req: Request) {
             {
               role: "system",
               content:
-                "Answer only using the context provided. Be concise and accurate.",
+                "Answer only using the context provided. Be concise and accurate. For queries beyond the context, reply with I only reply with the available contexts and list the available contexts",
             },
             {
               role: "user",
