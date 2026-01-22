@@ -3,8 +3,8 @@ import { getEmbedding } from "./embeddings";
 import { chunkText } from "./chunk";
 import { v4 as uuid } from "uuid";
 
-export async function indexDocument(text: string) {
-  const chunks = chunkText(text);
+export async function indexText(text: string) {
+  const chunks = chunkText(text, 800);
 
   for (const chunk of chunks) {
     const embedding = await getEmbedding(chunk);

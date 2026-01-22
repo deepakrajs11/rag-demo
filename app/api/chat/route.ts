@@ -1,51 +1,91 @@
 import { llm } from "@/lib/llm";
 import { searchSimilar } from "@/lib/search";
-import { indexDocument } from "@/lib/indexDocuments";
-import { qdrant } from "@/lib/qdrant";
-
-const DOCUMENT = `
-RAG stands for Retrieval Augmented Generation.
-It improves LLM answers by grounding them in external knowledge.
-`;
-
-let initialized = false;
-
-async function init() {
-  if (initialized) return;
-
-  const collections = await qdrant.getCollections();
-  const exists = collections.collections.some((c) => c.name === "documents");
-
-  if (!exists) {
-    await qdrant.createCollection("documents", {
-      vectors: { size: 1536, distance: "Cosine" },
-    });
-    await indexDocument(DOCUMENT);
-  }
-
-  initialized = true;
-}
 
 export async function POST(req: Request) {
-  await init();
-
   const { question } = await req.json();
 
   const contextChunks = await searchSimilar(question);
   const context = contextChunks.join("\n");
 
-  const response = await llm.chat.completions.create({
-    model: "mistralai/mistral-7b-instruct",
-    messages: [
-      { role: "system", content: "Answer only using the context." },
-      {
-        role: "user",
-        content: `Context:\n${context}\n\nQuestion:\n${question}`,
+  if (!context) {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        const message = {
+          content: "No documents found. Please upload documents first.",
+        };
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify(message)}\n\n`),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
       },
-    ],
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
+  }
+
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const response = await llm.chat.completions.create({
+          model: "mistralai/mistral-7b-instruct",
+          messages: [
+            {
+              role: "system",
+              content:
+                "Answer only using the context provided. Be concise and accurate.",
+            },
+            {
+              role: "user",
+              content: `Context:\n${context}\n\nQuestion:\n${question}`,
+            },
+          ],
+          stream: true, // Enable streaming
+          max_tokens: 1000,
+          temperature: 0.7,
+        });
+
+        // Stream the response chunks
+        for await (const chunk of response) {
+          const content = chunk.choices[0]?.delta?.content || "";
+          if (content) {
+            const data = { content };
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify(data)}\n\n`),
+            );
+          }
+        }
+
+        // Send done signal
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      } catch (error) {
+        console.error("Streaming error:", error);
+        const errorMessage = {
+          content: "Error: Failed to generate response.",
+        };
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      }
+    },
   });
 
-  return Response.json({
-    answer: response.choices[0].message.content,
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
   });
 }
