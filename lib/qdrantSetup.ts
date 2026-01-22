@@ -1,4 +1,3 @@
-// lib/qdrantSetup.ts
 import { qdrant } from "./qdrant";
 
 export async function ensureDocumentsCollection() {
@@ -6,7 +5,6 @@ export async function ensureDocumentsCollection() {
   const collectionNames = existing.collections.map((c) => c.name);
 
   if (!collectionNames.includes("documents")) {
-    // Correct signature: (name, config)
     await qdrant.createCollection("documents", {
       vectors: {
         size: 1536,
