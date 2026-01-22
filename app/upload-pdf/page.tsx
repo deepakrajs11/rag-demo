@@ -1,246 +1,255 @@
-'use client'
+"use client";
 
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Upload,
   FileText,
+  Loader2,
   CheckCircle,
   AlertCircle,
-  Loader2,
+  MessageSquare,
+  Moon,
+  Sun
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+
+type ThemeName = "forest" | "midnight";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
-interface PDFUploadProps {
-  onUpload?: (file: File) => Promise<void>;
-  apiEndpoint?: string;
-}
-
-const PDFUpload = ({
-  onUpload,
-  apiEndpoint = "/api/upload-pdf",
-}: PDFUploadProps) => {
+export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [message, setMessage] = useState("");
+  const router = useRouter();
+  const [currentTheme, setCurrentTheme] = useState<ThemeName>("forest");
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  }, []);
 
-  const validateFile = (file: File): boolean => {
+  const themes = {
+    forest: {
+      bg: "bg-gradient-to-br from-emerald-900 via-green-900 to-slate-900",
+      card: "bg-slate-800/50 backdrop-blur-xl border-emerald-500/20",
+      button:
+        "bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700",
+      text: "text-slate-100",
+      subtext: "text-slate-400",
+      icon: Moon,
+    },
+    midnight: {
+      bg: "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900",
+      card: "bg-slate-800/50 backdrop-blur-xl border-purple-500/20",
+      button:
+        "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700",
+      text: "text-slate-100",
+      subtext: "text-slate-400",
+      icon: Sun,
+    },
+  };
+
+  const theme = themes[currentTheme];
+
+  const toggleTheme = () =>
+    setCurrentTheme((t) => (t === "forest" ? "midnight" : "forest"));
+
+  const validateFile = (file: File) => {
     if (file.type !== "application/pdf") {
-      setMessage("Please upload a PDF file");
       setStatus("error");
+      setMessage("Only PDF files are allowed");
       return false;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setMessage("File size must be less than 10MB");
       setStatus("error");
+      setMessage("PDF must be smaller than 10MB");
       return false;
     }
     return true;
   };
+
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
+  }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && validateFile(droppedFile)) {
-      setFile(droppedFile);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped && validateFile(dropped)) {
+      setFile(dropped);
       setStatus("idle");
       setMessage("");
     }
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile && validateFile(selectedFile)) {
-      setFile(selectedFile);
-      setStatus("idle");
-      setMessage("");
-    }
-  };
-
   const handleUpload = async () => {
     if (!file) return;
 
     setStatus("uploading");
-    setMessage("Uploading and processing PDF...");
+    setMessage("Uploading and indexing document...");
 
     try {
-      if (onUpload) {
-        await onUpload(file);
-      } else {
-        const formData = new FormData();
-        formData.append("file", file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-        const response = await fetch(apiEndpoint, {
-          method: "POST",
-          body: formData,
-        });
+      const res = await fetch("/api/upload-pdf", {
+        method: "POST",
+        body: formData,
+      });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Upload failed");
-        }
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
 
       setStatus("success");
-      setMessage("PDF uploaded and indexed successfully!");
+      setMessage("Document uploaded and indexed successfully");
       setFile(null);
-    } catch (error) {
+    } catch (err) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Upload failed");
+      setMessage(err instanceof Error ? err.message : "Upload failed");
     }
   };
 
-  const resetUpload = () => {
-    setFile(null);
-    setStatus("idle");
-    setMessage("");
-  };
-
   return (
-    <Card className="w-full max-w-xl border-border bg-card shadow-lg">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-card-foreground">
-          Upload PDF Document
-        </CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Drag and drop your PDF file or click to browse
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Drop Zone */}
+    <div
+      className={`min-h-screen ${theme.bg} relative flex items-center justify-center p-6 pt-20`}
+    >
+      {/* Top Navigation */}
+      <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
+        <h2 className={`font-bold text-xl ${theme.text}`}>Document Uploader</h2>
+
+        <div className="flex items-center gap-2">
+          {/* Go to Chat */}
+          <button
+            onClick={() => router.push("/chatbot")}
+            className={cn(
+              "p-3 rounded-xl border transition-all hover:scale-105",
+              theme.card,
+              theme.text,
+            )}
+            title="Go to Chat"
+          >
+            <MessageSquare className="w-5 h-5" />
+          </button>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "p-3 rounded-xl text-white transition-all hover:scale-105",
+              theme.button,
+            )}
+            title="Toggle theme"
+          >
+            <theme.icon className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "w-full max-w-xl rounded-2xl border p-8 shadow-2xl",
+          theme.card,
+        )}
+      >
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className={`mx-auto mb-4 w-fit p-4 rounded-xl ${theme.button}`}>
+            <Upload className="w-7 h-7 text-white" />
+          </div>
+          <h1 className={`text-2xl font-bold ${theme.text}`}>
+            Upload PDF Document
+          </h1>
+          <p className={`mt-2 text-sm ${theme.subtext}`}>
+            Upload documents to power your RAG assistant
+          </p>
+        </div>
+
+        {/* Dropzone */}
         <div
           onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
           onDragOver={handleDrag}
+          onDragLeave={handleDrag}
           onDrop={handleDrop}
           className={cn(
-            "relative flex min-h-50 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all duration-200",
+            "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-all cursor-pointer",
             dragActive
-              ? "border-primary bg-primary/5"
-              : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50",
-            status === "error" && "border-destructive/50 bg-destructive/5",
+              ? "border-emerald-400 bg-emerald-500/10"
+              : "border-emerald-500/30 hover:border-emerald-400",
+            status === "error" && "border-red-500/40 bg-red-500/10",
           )}
         >
           <input
             type="file"
-            accept=".pdf,application/pdf"
-            onChange={handleFileChange}
-            className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+            accept="application/pdf"
+            onChange={(e) => {
+              const selected = e.target.files?.[0];
+              if (!selected) return;
+
+              if (validateFile(selected)) {
+                setFile(selected);
+                setStatus("idle");
+                setMessage("");
+              }
+            }}
+            className="absolute inset-0 opacity-0 cursor-pointer"
             disabled={status === "uploading"}
           />
 
           {!file ? (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div
-                className={cn(
-                  "rounded-full p-4 transition-colors",
-                  dragActive
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                <Upload className="h-8 w-8" />
-              </div>
-              <div>
-                <p className="text-lg font-medium text-foreground">
-                  {dragActive ? "Drop your PDF here" : "Choose a PDF file"}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  or drag and drop it here
-                </p>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Maximum file size: 10MB
+            <>
+              <FileText className="w-10 h-10 text-emerald-400 mb-4" />
+              <p className={`font-medium ${theme.text}`}>
+                Drag & drop a PDF here
               </p>
-            </div>
+              <p className={`text-sm ${theme.subtext}`}>
+                or click to browse (max 10MB)
+              </p>
+            </>
           ) : (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div className="rounded-full bg-primary/10 p-4 text-primary">
-                <FileText className="h-8 w-8" />
-              </div>
-              <div>
-                <p className="text-lg font-medium text-foreground">
-                  {file.name}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            </div>
+            <>
+              <CheckCircle className="w-10 h-10 text-emerald-400 mb-4" />
+              <p className={`font-medium ${theme.text}`}>{file.name}</p>
+              <p className={`text-sm ${theme.subtext}`}>
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+              </p>
+            </>
           )}
         </div>
 
-        {/* Status Message */}
+        {/* Status */}
         {message && (
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-lg p-4",
-              status === "success" && "bg-primary/10 text-primary",
-              status === "error" && "bg-destructive/10 text-destructive",
-              status === "uploading" && "bg-muted text-muted-foreground",
-            )}
-          >
+          <div className="mt-6 flex items-center gap-3 text-sm">
             {status === "uploading" && (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
             )}
-            {status === "success" && <CheckCircle className="h-5 w-5" />}
-            {status === "error" && <AlertCircle className="h-5 w-5" />}
-            <span className="text-sm font-medium">{message}</span>
+            {status === "success" && (
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+            )}
+            {status === "error" && (
+              <AlertCircle className="w-4 h-4 text-red-400" />
+            )}
+            <span className={theme.subtext}>{message}</span>
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          {file && status !== "uploading" && (
-            <Button variant="outline" onClick={resetUpload} className="flex-1">
-              Clear
-            </Button>
+        {/* Action */}
+        <button
+          onClick={handleUpload}
+          disabled={!file || status === "uploading"}
+          className={cn(
+            "mt-8 w-full py-3 rounded-xl text-white font-medium transition-all",
+            theme.button,
+            (!file || status === "uploading") &&
+              "opacity-50 cursor-not-allowed",
           )}
-          <Button
-            onClick={handleUpload}
-            disabled={!file || status === "uploading"}
-            className={cn("flex-1", !file && "w-full")}
-          >
-            {status === "uploading" ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload PDF
-              </>
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        >
+          {status === "uploading" ? "Uploading..." : "Upload & Index PDF"}
+        </button>
+      </div>
+    </div>
   );
-};
-
-export default PDFUpload;
+}

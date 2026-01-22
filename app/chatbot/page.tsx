@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from "react";
-import { Send, FileText, Moon, Sun, Sparkles, Loader2 } from "lucide-react";
+import { Send, FileText, Moon, Sun, Sparkles, Loader2, RocketIcon } from "lucide-react";
+import { Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Message {
   role: "user" | "assistant";
@@ -87,7 +89,7 @@ export default function RAGChatbot() {
   const [currentTheme, setCurrentTheme] = useState<ThemeName>("forest");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const theme = themes[currentTheme];
-
+  const router = useRouter();
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -113,6 +115,26 @@ export default function RAGChatbot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: input }),
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        setMessages((prev) =>
+          prev.map((msg, i) =>
+            i === prev.length - 1
+              ? {
+                  ...msg,
+                  content:
+                    errorText ||
+                    "No documents found. Please upload documents first.",
+                }
+              : msg,
+          ),
+        );
+
+        setIsLoading(false);
+        return;
+      }
 
       if (!response.body) {
         throw new Error("Response body is null");
@@ -205,13 +227,25 @@ export default function RAGChatbot() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={cycleTheme}
-              className={`p-3 rounded-xl ${theme.button} text-white transition-all hover:scale-105`}
-              title={`Switch to next theme (Current: ${theme.name})`}
-            >
-              <ThemeIcon className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Upload Documents */}
+              <button
+                onClick={() => router.push("/upload-pdf")}
+                className={`p-3 rounded-xl ${theme.card} ${theme.text} border transition-all hover:scale-105`}
+                title="Upload documents"
+              >
+                <Upload className="w-5 h-5" />
+              </button>
+
+              {/* Theme Switch */}
+              <button
+                onClick={cycleTheme}
+                className={`p-3 rounded-xl ${theme.button} text-white transition-all hover:scale-105`}
+                title={`Switch theme (Current: ${theme.name})`}
+              >
+                <ThemeIcon className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -224,13 +258,13 @@ export default function RAGChatbot() {
                   <div
                     className={`inline-flex p-6 rounded-2xl ${theme.card} border`}
                   >
-                    <Sparkles className={`w-12 h-12 ${theme.subtext}`} />
+                    <RocketIcon className={`w-12 h-12 ${theme.subtext}`} />
                   </div>
                   <h2 className={`text-xl font-semibold ${theme.text}`}>
                     Start a conversation
                   </h2>
                   <p className={`${theme.subtext} max-w-md`}>
-                    Ask questions about your uploaded documents and get
+                    Ask questions about your uploaded knowledge base and get the
                     AI-powered answers.
                   </p>
                 </div>

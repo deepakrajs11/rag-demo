@@ -1,9 +1,13 @@
-import { qdrant } from "./qdrant";
-import { getEmbedding } from "./embeddings";
 import { chunkText } from "./chunk";
-import { v4 as uuid } from "uuid";
+import { getEmbedding } from "./embeddings";
+import { qdrant } from "./qdrant";
 
-export async function indexText(text: string) {
+interface IndexMeta {
+  documentId: string;
+  fileName: string;
+}
+
+export async function indexText(text: string, meta: IndexMeta) {
   const chunks = chunkText(text, 800);
 
   for (const chunk of chunks) {
@@ -16,9 +20,18 @@ export async function indexText(text: string) {
           vector: embedding,
           payload: {
             text: chunk,
+            documentId: meta.documentId,
+            fileName: meta.fileName,
+            createdAt: Date.now(),
           },
         },
       ],
     });
   }
+
+  console.log(`✅ Indexed ${chunks.length} chunks for ${meta.fileName}`);
 }
+function uuid(): string | number {
+    throw new Error("Function not implemented.");
+}
+
