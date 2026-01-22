@@ -1,15 +1,24 @@
-import { chunkText } from "./chunk";
+import { qdrant } from "./qdrant";
 import { getEmbedding } from "./embeddings";
-import { VectorItem } from "./vectorStore";
+import { chunkText } from "./chunk";
+import { v4 as uuid } from "uuid";
 
 export async function indexDocument(text: string) {
   const chunks = chunkText(text);
-  const store: VectorItem[] = [];
 
   for (const chunk of chunks) {
     const embedding = await getEmbedding(chunk);
-    store.push({ text: chunk, embedding });
-  }
 
-  return store;
+    await qdrant.upsert("documents", {
+      points: [
+        {
+          id: uuid(),
+          vector: embedding,
+          payload: {
+            text: chunk,
+          },
+        },
+      ],
+    });
+  }
 }
