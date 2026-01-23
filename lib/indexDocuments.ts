@@ -1,6 +1,8 @@
 import { chunkText } from "./chunk";
 import { getEmbedding } from "./embeddings";
 import { qdrant } from "./qdrant";
+import { v4 as uuid } from "uuid";
+
 
 interface IndexMeta {
   documentId: string;
@@ -30,8 +32,5 @@ export async function indexText(text: string, meta: IndexMeta) {
   }
 
   console.log(`✅ Indexed ${chunks.length} chunks for ${meta.fileName}`);
-}
-function uuid(): string | number {
-    throw new Error("Function not implemented.");
 }
 
