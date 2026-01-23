@@ -375,6 +375,624 @@ const RAGPresentation = () => {
       ),
     },
 
+    {
+      type: "content",
+      title: "Understanding Embeddings: Converting Text to Vectors",
+      content: (
+        <div className="space-y-6">
+          <div className="bg-linear-to-r from-indigo-100 to-blue-100 p-6 rounded-xl border-2 border-indigo-400">
+            <h3 className="text-2xl font-bold mb-4 flex items-center text-indigo-800">
+              <Brain className="w-8 h-8 mr-3" />
+              What are Embeddings?
+            </h3>
+            <p className="text-lg text-gray-700 mb-3">
+              Embeddings are numerical representations (vectors) that capture
+              the semantic meaning of text, images, or other data.
+            </p>
+            <p className="text-lg text-gray-700">
+              Think of embeddings as coordinates in a high-dimensional space
+              where similar meanings are located close together.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl border-2 border-purple-300 shadow-lg">
+              <h4 className="text-xl font-bold mb-4 text-purple-800">
+                Text Example
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-purple-50 p-3 rounded-lg">
+                  <p className="font-semibold text-purple-700">Input Text:</p>
+                  <p className="text-gray-700">"The cat sat on the mat"</p>
+                </div>
+                <div className="text-center text-2xl text-purple-600">↓</div>
+                <div className="bg-purple-50 p-3 rounded-lg">
+                  <p className="font-semibold text-purple-700">
+                    Embedding Model:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    OpenAI, Google, Cohere, etc.
+                  </p>
+                </div>
+                <div className="text-center text-2xl text-purple-600">↓</div>
+                <div className="bg-purple-50 p-3 rounded-lg">
+                  <p className="font-semibold text-purple-700">
+                    Vector Output:
+                  </p>
+                  <p className="text-xs text-gray-600 font-mono">
+                    [0.23, -0.45, 0.67, 0.12, -0.89, ...]
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    (1536 dimensions for OpenAI)
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border-2 border-green-300 shadow-lg">
+              <h4 className="text-xl font-bold mb-4 text-green-800">
+                Why Vectors?
+              </h4>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      Captures Meaning
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Words with similar meanings have similar vectors
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      Mathematical Operations
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Can calculate similarity using distance metrics
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 shrink-0 mt-1" />
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      Context Awareness
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Same word in different contexts = different vectors
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-linear-to-r from-yellow-100 to-orange-100 p-6 rounded-xl border-l-4 border-yellow-500">
+            <h4 className="text-xl font-bold mb-3 text-orange-800">
+              Semantic Similarity Example:
+            </h4>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-semibold text-gray-800 mb-2">"King"</p>
+                <p className="text-xs text-gray-600">Vector: [0.2, 0.8, ...]</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-semibold text-gray-800 mb-2">"Queen"</p>
+                <p className="text-xs text-gray-600">Vector: [0.3, 0.7, ...]</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-semibold text-gray-800 mb-2">"Monarch"</p>
+                <p className="text-xs text-gray-600">
+                  Vector: [0.25, 0.75, ...]
+                </p>
+              </div>
+            </div>
+            <p className="text-center mt-4 text-gray-700 font-semibold">
+              These vectors would be close to each other in the vector space!
+            </p>
+          </div>
+        </div>
+      ),
+    },
+
+    // Document Processing Pipeline Slide
+    {
+      type: "content",
+      title: "The RAG Pipeline: From Documents to Vector Store",
+      content: (
+        <div className="space-y-6">
+          <div className="bg-linear-to-r from-blue-100 to-cyan-100 p-6 rounded-xl border-2 border-blue-400">
+            <h3 className="text-2xl font-bold mb-4 text-center text-blue-800">
+              Complete Document Processing Flow
+            </h3>
+          </div>
+
+          <div className="space-y-4">
+            {/* Step 1: Load Documents */}
+            <div className="bg-white p-6 rounded-xl border-l-4 border-blue-500 shadow-lg">
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl">
+                  1
+                </div>
+                <h4 className="text-2xl font-bold text-blue-800">
+                  Load Documents
+                </h4>
+              </div>
+              <div className="ml-14 space-y-2">
+                <p className="text-gray-700 text-lg">
+                  Upload your documents (PDFs, Word files, web pages, etc.)
+                </p>
+                <div className="bg-blue-50 p-3 rounded-lg mt-3">
+                  <p className="text-sm font-mono text-gray-600">
+                    📄 company_handbook.pdf
+                    <br />
+                    📄 product_catalog.docx
+                    <br />
+                    📄 support_articles.txt
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Text Extraction */}
+            <div className="bg-white p-6 rounded-xl border-l-4 border-purple-500 shadow-lg">
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl">
+                  2
+                </div>
+                <h4 className="text-2xl font-bold text-purple-800">
+                  Extract Text Content
+                </h4>
+              </div>
+              <div className="ml-14">
+                <p className="text-gray-700 text-lg">
+                  Parse and extract raw text from documents
+                </p>
+                <div className="bg-purple-50 p-3 rounded-lg mt-3">
+                  <p className="text-sm text-gray-700">
+                    "Our company offers comprehensive health insurance coverage
+                    for all employees. The plan includes dental, vision, and
+                    mental health services..."
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3: Chunking */}
+            <div className="bg-white p-6 rounded-xl border-l-4 border-pink-500 shadow-lg">
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="bg-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl">
+                  3
+                </div>
+                <h4 className="text-2xl font-bold text-pink-800">
+                  Split into Chunks
+                </h4>
+              </div>
+              <div className="ml-14 space-y-3">
+                <p className="text-gray-700 text-lg">
+                  Break large documents into smaller, manageable pieces
+                </p>
+                <div className="bg-pink-50 p-4 rounded-lg">
+                  <p className="font-semibold text-pink-700 mb-2">
+                    Why Chunking?
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-pink-600" />
+                      <span>
+                        LLMs have token limits - can't process entire books at
+                        once
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-pink-600" />
+                      <span>Smaller chunks = more precise retrieval</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-pink-600" />
+                      <span>Better embeddings for focused content</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3 mt-3">
+                  <div className="bg-pink-100 p-3 rounded-lg text-center">
+                    <p className="text-xs font-semibold text-pink-800">
+                      Chunk 1
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Health insurance...
+                    </p>
+                  </div>
+                  <div className="bg-pink-100 p-3 rounded-lg text-center">
+                    <p className="text-xs font-semibold text-pink-800">
+                      Chunk 2
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Vacation policy...
+                    </p>
+                  </div>
+                  <div className="bg-pink-100 p-3 rounded-lg text-center">
+                    <p className="text-xs font-semibold text-pink-800">
+                      Chunk 3
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">Remote work...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 4: Generate Embeddings */}
+            <div className="bg-white p-6 rounded-xl border-l-4 border-green-500 shadow-lg">
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl">
+                  4
+                </div>
+                <h4 className="text-2xl font-bold text-green-800">
+                  Generate Embeddings
+                </h4>
+              </div>
+              <div className="ml-14">
+                <p className="text-gray-700 text-lg">
+                  Convert each chunk into a vector using an embedding model
+                </p>
+                <div className="bg-green-50 p-3 rounded-lg mt-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center">
+                      <p className="text-xs font-semibold text-green-800 mb-1">
+                        Chunk 1
+                      </p>
+                      <p className="text-xs font-mono text-gray-600">
+                        [0.23, -0.45, 0.67, ...]
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-semibold text-green-800 mb-1">
+                        Chunk 2
+                      </p>
+                      <p className="text-xs font-mono text-gray-600">
+                        [0.12, 0.89, -0.34, ...]
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-semibold text-green-800 mb-1">
+                        Chunk 3
+                      </p>
+                      <p className="text-xs font-mono text-gray-600">
+                        [-0.56, 0.78, 0.23, ...]
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 5: Store in Vector DB */}
+            <div className="bg-white p-6 rounded-xl border-l-4 border-orange-500 shadow-lg">
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl">
+                  5
+                </div>
+                <h4 className="text-2xl font-bold text-orange-800">
+                  Store in Vector Database
+                </h4>
+              </div>
+              <div className="ml-14">
+                <p className="text-gray-700 text-lg">
+                  Save vectors with metadata for efficient retrieval
+                </p>
+                <div className="bg-orange-50 p-4 rounded-lg mt-3">
+                  <p className="font-semibold text-orange-700 mb-2">
+                    What Gets Stored:
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-start space-x-2">
+                      <Database className="w-4 h-4 text-orange-600 mt-1 shrink-0" />
+                      <div>
+                        <span className="font-semibold">Vector:</span> The
+                        numerical embedding
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Database className="w-4 h-4 text-orange-600 mt-1 shrink-0" />
+                      <div>
+                        <span className="font-semibold">Original Text:</span>{" "}
+                        The actual chunk content
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Database className="w-4 h-4 text-orange-600 mt-1 shrink-0" />
+                      <div>
+                        <span className="font-semibold">Metadata:</span> Source
+                        file, page number, timestamps
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    // How Vector DB Understands Meaning Slide
+    {
+      type: "content",
+      title: "How Vector Databases Understand Meaning",
+      content: (
+        <div className="space-y-6">
+          <div className="bg-linear-to-r from-cyan-100 to-blue-100 p-6 rounded-xl border-2 border-cyan-400">
+            <h3 className="text-2xl font-bold mb-3 text-center text-cyan-800">
+              Semantic Search: Finding Meaning, Not Just Keywords
+            </h3>
+          </div>
+
+          {/* Visual Representation */}
+          <div className="bg-white p-6 rounded-xl border-2 border-purple-300 shadow-lg">
+            <h4 className="text-xl font-bold mb-4 text-purple-800">
+              Vector Space Visualization
+            </h4>
+            <div className="bg-purple-50 p-6 rounded-lg">
+              <p className="text-center text-sm text-gray-600 mb-4">
+                Similar concepts cluster together in vector space
+              </p>
+              <div className="grid grid-cols-3 gap-8">
+                <div className="space-y-3">
+                  <div className="bg-blue-200 p-4 rounded-full text-center font-semibold text-blue-900">
+                    King
+                  </div>
+                  <div className="bg-blue-200 p-4 rounded-full text-center font-semibold text-blue-900">
+                    Queen
+                  </div>
+                  <div className="bg-blue-200 p-4 rounded-full text-center font-semibold text-blue-900">
+                    Monarch
+                  </div>
+                  <p className="text-center text-xs text-blue-800 font-semibold">
+                    Royalty Cluster
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-green-200 p-4 rounded-full text-center font-semibold text-green-900">
+                    Dog
+                  </div>
+                  <div className="bg-green-200 p-4 rounded-full text-center font-semibold text-green-900">
+                    Cat
+                  </div>
+                  <div className="bg-green-200 p-4 rounded-full text-center font-semibold text-green-900">
+                    Pet
+                  </div>
+                  <p className="text-center text-xs text-green-800 font-semibold">
+                    Animals Cluster
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-orange-200 p-4 rounded-full text-center font-semibold text-orange-900">
+                    Python
+                  </div>
+                  <div className="bg-orange-200 p-4 rounded-full text-center font-semibold text-orange-900">
+                    JavaScript
+                  </div>
+                  <div className="bg-orange-200 p-4 rounded-full text-center font-semibold text-orange-900">
+                    Code
+                  </div>
+                  <p className="text-center text-xs text-orange-800 font-semibold">
+                    Programming Cluster
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Similarity Calculation */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl border-2 border-blue-300 shadow-lg">
+              <h4 className="text-xl font-bold mb-4 text-blue-800 flex items-center">
+                <Search className="w-6 h-6 mr-2" />
+                Similarity Metrics
+              </h4>
+              <div className="space-y-3">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="font-semibold text-blue-700 mb-2">
+                    Cosine Similarity
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Measures the angle between vectors (most common)
+                  </p>
+                  <div className="bg-blue-100 p-2 rounded mt-2">
+                    <p className="text-xs font-mono text-gray-700">
+                      Range: -1 to 1 (1 = identical)
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="font-semibold text-blue-700 mb-2">
+                    Euclidean Distance
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Straight-line distance between points
+                  </p>
+                  <div className="bg-blue-100 p-2 rounded mt-2">
+                    <p className="text-xs font-mono text-gray-700">
+                      Smaller = more similar
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="font-semibold text-blue-700 mb-2">
+                    Dot Product
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    Direct multiplication of vectors
+                  </p>
+                  <div className="bg-blue-100 p-2 rounded mt-2">
+                    <p className="text-xs font-mono text-gray-700">
+                      Higher = more similar
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border-2 border-green-300 shadow-lg">
+              <h4 className="text-xl font-bold mb-4 text-green-800 flex items-center">
+                <Zap className="w-6 h-6 mr-2" />
+                Search Query Flow
+              </h4>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">
+                    1
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg flex-1">
+                    <p className="font-semibold text-green-800">User Query</p>
+                    <p className="text-sm text-gray-700">
+                      "How do I fix a broken laptop screen?"
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">
+                    2
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg flex-1">
+                    <p className="font-semibold text-green-800">
+                      Convert to Vector
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Query embedding: [0.45, -0.23, ...]
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">
+                    3
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg flex-1">
+                    <p className="font-semibold text-green-800">
+                      Calculate Similarity
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Compare query vector with all stored vectors
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">
+                    4
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg flex-1">
+                    <p className="font-semibold text-green-800">
+                      Return Top Results
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Most similar chunks (even if words differ!)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Real Example */}
+          <div className="bg-linear-to-r from-yellow-100 to-orange-100 p-6 rounded-xl border-2 border-yellow-400">
+            <h4 className="text-xl font-bold mb-4 text-orange-800">
+              Real Example: Semantic Understanding
+            </h4>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-semibold text-blue-700 mb-3">User Query:</p>
+                <p className="text-gray-800 italic">
+                  "How can I repair a damaged display?"
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <p className="font-semibold text-green-700 mb-3">
+                  Retrieved Chunks:
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="bg-green-50 p-2 rounded">
+                    <span className="font-semibold">✓ Match 1:</span> "Screen
+                    replacement guide..."
+                  </div>
+                  <div className="bg-green-50 p-2 rounded">
+                    <span className="font-semibold">✓ Match 2:</span> "Fixing
+                    broken LCD panels..."
+                  </div>
+                  <div className="bg-green-50 p-2 rounded">
+                    <span className="font-semibold">✓ Match 3:</span> "Monitor
+                    repair tutorial..."
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-orange-50 p-4 rounded-lg mt-4 border-l-4 border-orange-500">
+              <p className="text-sm text-gray-800">
+                <span className="font-semibold">Notice:</span> The query used
+                "repair" and "display" but found content with "fix",
+                "replacement", "screen", "LCD", and "monitor" - because they're
+                semantically similar!
+              </p>
+            </div>
+          </div>
+
+          {/* Key Advantages */}
+          <div className="bg-linear-to-r from-green-100 to-teal-100 p-6 rounded-xl border-l-4 border-green-500">
+            <h4 className="text-xl font-bold mb-3 text-green-800">
+              Why This is Powerful:
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    Language Flexibility
+                  </p>
+                  <p className="text-gray-600">
+                    Different phrasings, same meaning
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    Multilingual Support
+                  </p>
+                  <p className="text-gray-600">Works across languages</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-800">Typo Tolerance</p>
+                  <p className="text-gray-600">Still finds relevant content</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    Contextual Understanding
+                  </p>
+                  <p className="text-gray-600">
+                    Captures intent, not just words
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
     // Examples & Use Cases Slide
     {
       type: "content",
